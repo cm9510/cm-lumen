@@ -1,28 +1,49 @@
 <?php
+require_once '../vendor/autoload.php';
 
-/*
-|--------------------------------------------------------------------------
-| Create The Application
-|--------------------------------------------------------------------------
-|
-| First we need to get an application instance. This creates an instance
-| of the application / container and bootstraps the application so it
-| is ready to receive HTTP / Console requests from the environment.
-|
-*/
+(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(dirname(__DIR__)))->bootstrap();
 
-$app = require __DIR__.'/../bootstrap/app.php';
+date_default_timezone_set('PRC');
 
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request
-| through the kernel, and send the associated response back to
-| the client's browser allowing them to enjoy the creative
-| and wonderful application we have prepared for them.
-|
-*/
+# Create The Application
+$app = new Laravel\Lumen\Application(dirname(__DIR__));
+
+$app->withFacades();
+$app->withEloquent();
+
+# Register Container Bindings
+$app->singleton('Illuminate\Contracts\Debug\ExceptionHandler', 'App\Exceptions\Handler');
+$app->singleton('Illuminate\Contracts\Console\Kernel', 'App\Console\Kernel');
+
+$app->singleton('redis', function (){
+    return new App\Service\Redis([
+        'host'=> env('REDIS_HOST', '127.0.0.1'),
+        'port'=> env('REDIS_PORT', 6379),
+        'timeout'=> env('REDIS_TIMEOUT', 30),
+        'password'=> env('REDIS_PASSWORD', '')
+    ]);
+});
+# Register Config Files
+//$app->configure('app');
+
+# Register Middleware
+//$app->middleware([]);
+//$app->routeMiddleware([]);
+
+# Register Service Providers
+// $app->register(App\Providers\AppServiceProvider::class);
+// $app->register(App\Providers\AuthServiceProvider::class);
+// $app->register(App\Providers\EventServiceProvider::class);
+
+# Load The Routes
+$app->router->get('/', function () use ($app){
+    return $app->router->app->version();
+});
+$app->router->group(['namespace' => 'App\Http\Controllers\Admin','prefix'=>'w'], function ($router) {
+    require __DIR__.'/../routes/web.php';
+});
+$app->router->group(['namespace' => 'App\Http\Controllers\Api','prefix'=>'c'], function ($router) {
+    require __DIR__.'/../routes/api.php';
+});
 
 $app->run();
