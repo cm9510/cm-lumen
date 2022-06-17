@@ -1,12 +1,30 @@
 <?php
 namespace App\Http\Controllers;
 
+use Gregwar\Captcha\CaptchaBuilder;
+
 class Common extends Controller
 {
     public function __construct()
     {
         parent::__construct();
     }
+
+    // 生成验证码
+    public function captcha()
+    {
+        $key = trim($this->params['kw'] ?? 'k');
+        if(!in_array($key,['admin',''])){
+            return $this->failJson('错误的标识');
+        }
+        $builder = new CaptchaBuilder;
+        $builder->build();
+        $phrase = strtolower($builder->getPhrase());
+        app('redis')->setKey('captcha_'.$key.'_'.$phrase, $_SERVER['REQUEST_TIME'], 120);
+
+        return $this->successJson(['src'=> $builder->inline()]);
+    }
+
 
     // 上传图片
     public function uploadImg()
