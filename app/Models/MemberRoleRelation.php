@@ -13,13 +13,13 @@ class MemberRoleRelation extends Model
 
     /**
      * 管理角色
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
      */
     public function roles()
     {
-        return $this->hasMany('App\Models\Roles','admin_id')
+        return $this->hasOne('App\Models\Roles','id','member_id')
             ->where(['status'=>0,'deleted'=>0])
-            ->select(['id','name','roles']);
+            ->select(['id','name','key','roles','redirect']);
     }
 
 }

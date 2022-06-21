@@ -19,4 +19,13 @@ class Members extends Model
 
     public $timestamps = false;
 
+    /**
+     * 关联角色
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function roles()
+    {
+        return $this->hasMany('App\Models\MemberRoleRelation','member_id','id')->select(['member_id','role_id']);
+    }
+
 }

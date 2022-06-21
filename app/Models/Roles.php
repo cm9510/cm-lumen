@@ -9,12 +9,14 @@ class Roles extends Model
 
     protected $fillable = [
         'name',
+        'key',
         'desc',
         'permission_id',
         'roles',
         'status',
         'creator_id',
         'updator_id',
+        'redirect',
         'create_at'
     ];
 
@@ -35,7 +37,7 @@ class Roles extends Model
      */
     public function updator()
     {
-        return $this->hasOne('App\Models\Members','id','creator_id')->select(['id','nickname','phone']);
+        return $this->hasOne('App\Models\Members','id','updator_id')->select(['id','nickname','phone']);
     }
 
 }

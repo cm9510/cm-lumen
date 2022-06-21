@@ -33,6 +33,6 @@ class Permissions extends Model
      */
     public function updator()
     {
-        return $this->hasOne('App\Models\Members','id','creator_id')->select(['id','nickname','phone']);
+        return $this->hasOne('App\Models\Members','id','updator_id')->select(['id','nickname','phone']);
     }
 }

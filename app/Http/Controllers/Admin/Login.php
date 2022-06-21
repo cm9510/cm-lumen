@@ -47,9 +47,13 @@ class Login extends Controller
             'roles'=>[]
         ];
         // 查出角色&权限
-        $roles = MemberRoleRelation::where('admin_id', $member->id)->with('roles')->get();
+        $roles = MemberRoleRelation::where('member_id', $member->id)->with('roles')->get();
         if(!$roles->isEmpty()){
-            $result['roles'] = $roles->pluck('roles')->pluck('roles');
+            $roles = $roles->pluck('roles');
+            foreach ($roles as $r) {
+                unset($r->id);
+            }
+            $result['roles'] = $roles;
         }
 
         // 存入缓存
