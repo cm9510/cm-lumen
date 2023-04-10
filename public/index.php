@@ -1,7 +1,7 @@
 <?php
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-# Load The Routes
+# Load Routes
 $app->router->get('/', function () use ($app){
     return $app->router->app->version();
 });
