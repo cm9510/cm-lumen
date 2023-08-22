@@ -11,6 +11,7 @@ class Permissions extends Model
         'name',
         'url',
         'status',
+        'log',
         'creator_id',
         'updator_id',
         'create_at'

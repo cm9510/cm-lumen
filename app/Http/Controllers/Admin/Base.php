@@ -3,12 +3,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\CommonEnums;
 use App\Http\Controllers\Controller;
+use App\Models\MemberLog;
 use App\Models\Permissions;
 use Illuminate\Support\Facades\DB;
 
 class Base extends Controller
 {
     protected $aid = 0;
+    protected $logId = 0;
 
     public function __construct()
     {
@@ -46,10 +48,39 @@ class Base extends Controller
             $pid = explode(',',implode(',',$pid));
             $pid = array_unique($pid);
 
-            $permission = Permissions::whereIn('id',$pid)->where(['url'=>$path,'status'=>0,'deleted'=>CommonEnums::NORMAL])->select(['name'])->first();
+            $permission = Permissions::whereIn('id',$pid)->where(['url'=>$path,'status'=>0,'deleted'=>CommonEnums::NORMAL])->select(['name','log'])->first();
             if(empty($permission)){
                 $this->exitError('无权限访问：['.$path.']');
             }
+            if ($permission->log == 1){
+                $r = request();
+                $h = [];
+                foreach ($r->headers as $k => $v) {
+                    if (!in_array($k,['accept-language','accept','sec-ch-ua-mobile','sec-fetch-site','accept-encoding','referer','sec-fetch-dest'])){
+                        $h[$k] = $v;
+                    }
+                }
+                $this->logId = MemberLog::insertGetId([
+                    'member_id'=>$this->aid,
+                    'title'=> '调用了【'.$permission->name.'】',
+                    'detail'=>'',
+                    'ip'=>request()->ip(),
+                    'request'=>json_encode([
+                        'path'=> $r->getRequestUri(),
+                        'method'=> $r->getMethod(),
+                        'header'=> $h,
+                        'body'=> $r->request
+                    ],256),
+                    'created_at'=>$_SERVER['REQUEST_TIME']
+                ]);
+            }
+        }
+    }
+
+    protected function saveLog(string $remark)
+    {
+        if ($remark){
+            MemberLog::where('id',$this->logId)->update(['detail'=>$remark]);
         }
     }
 }

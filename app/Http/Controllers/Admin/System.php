@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\CommonEnums;
-use Cm\CmTool\Tools;
+use Cm\Tool\Tools;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\{MemberRoleRelation, Members, Roles, Permissions};
@@ -51,6 +51,7 @@ class System extends Base
             if(is_numeric($v) && $v){
                 return $v;
             }
+            return null;
         }, $permissions);
         sort($permissions);
         $permissions = implode(',', $permissions);
@@ -152,6 +153,7 @@ class System extends Base
         $name = trim($this->params['name'] ?? '');
         $url = trim($this->params['url'] ?? '');
         $status = intval($this->params['status'] ?? '');
+        $log = intval($this->params['log'] ?? '');
         if(!$name){
             return $this->failJson('权限名不能为空');
         }elseif (!$url){
@@ -159,7 +161,7 @@ class System extends Base
         }
 
         if($id){ // 修改
-            $permission = Permissions::where(['id'=>$id,'deleted'=>CommonEnums::NORMAL])->select(['id','name','url','status','creator_id','updator_id'])->first();
+            $permission = Permissions::where(['id'=>$id,'deleted'=>CommonEnums::NORMAL])->select(['id','name','url','status','log','creator_id','updator_id'])->first();
             if(empty($permission)){
                 return $this->failJson('权限不存在');
             }
@@ -167,12 +169,13 @@ class System extends Base
             if($permission->name != $name) $update['name'] = $name;
             if($permission->url != $url) $update['url'] = $url;
             if($permission->status != $status) $update['status'] = $status;
+            if($permission->log != $status) $update['log'] = $log;
             if($permission->creator_id != $this->aid) $update['updator_id'] = $this->aid;
 
             if($update){
                 $res = $permission->update($update);
             }else{
-                return $this->successJson([],'修改成功');
+                return $this->successJson([],'已修改');
             }
             $op = '修改';
         }else{
@@ -180,8 +183,9 @@ class System extends Base
                 'name'=> $name,
                 'url'=> $url,
                 'status'=> $status,
-                'creator_id'=>$this->aid,
-                'create_at'=>$_SERVER['REQUEST_TIME']
+                'log'=> $log,
+                'creator_id'=> $this->aid,
+                'create_at'=> $_SERVER['REQUEST_TIME']
             ]);
             $op = '添加';
         }
@@ -198,11 +202,13 @@ class System extends Base
 
         $where = [['deleted','=',CommonEnums::NORMAL]];
         if($keyword){
-            $where[] = ['name', 'like', '%'.$keyword.'%'];
+            $where[] = [function($query) use($keyword){
+                $query->where('name','like','%'.$keyword.'%')->orWhere('url','like','%'.$keyword.'%');
+            }];
         }
         $total = Permissions::where($where)->count();
         $list = Permissions::where($where)->with(['creator','updator'])
-            ->select(['id','name','url','status','creator_id','updator_id','create_at'])
+            ->select(['id','name','url','status','log','creator_id','updator_id','create_at'])
             ->offset($page)->limit($size)
             ->get();
 
@@ -211,7 +217,6 @@ class System extends Base
                 unset($v->creator_id, $v->updator_id);
             }
         }
-
         return $this->successJson(['total'=>$total, 'list'=>$list]);
     }
 
