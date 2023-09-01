@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Members extends Model
 {
@@ -14,16 +15,16 @@ class Members extends Model
         'salt',
         'status',
         'last_login_at',
-        'create_at'
+        'created_at'
     ];
 
     public $timestamps = false;
 
     /**
      * 关联角色
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function roles()
+    public function roleIds(): HasMany
     {
         return $this->hasMany('App\Models\MemberRoleRelation','member_id','id')->select(['member_id','role_id']);
     }

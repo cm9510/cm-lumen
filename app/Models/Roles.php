@@ -17,7 +17,7 @@ class Roles extends Model
         'creator_id',
         'updator_id',
         'redirect',
-        'create_at'
+        'created_at'
     ];
 
     public $timestamps = false;

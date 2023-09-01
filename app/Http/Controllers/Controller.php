@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\MemberLog;
 use Illuminate\Support\Facades\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Http\JsonResponse;
@@ -12,7 +13,6 @@ class Controller extends BaseController
 
     # request params array
     protected $params = [];
-
 
     protected function __construct()
     {
@@ -53,6 +53,37 @@ class Controller extends BaseController
     {
         header('Content-Type:application/json;charset=utf-8');
         exit(json_encode(['code'=> $code, 'msg'=> $msg],JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
+     * 成员操作日志
+     * @param int $memberId
+     * @param string $title
+     * @param string $detail
+     * @return int
+     */
+    protected function writeMemberLog(int $memberId, string $title, string $detail=''):int
+    {
+        $r = request();
+        $h = [];
+        foreach ($r->headers as $k => $v) {
+            if (!in_array($k,['accept-language','accept','sec-ch-ua-mobile','sec-fetch-site','accept-encoding','referer','sec-fetch-dest'])){
+                $h[$k] = $v;
+            }
+        }
+        return MemberLog::insertGetId([
+            'member_id'=>$memberId,
+            'title'=> $title,
+            'detail'=> $detail,
+            'ip'=>request()->ip(),
+            'request'=>json_encode([
+                'path'=> $r->getRequestUri(),
+                'method'=> $r->getMethod(),
+                'header'=> $h,
+                'body'=> $r->request
+            ],256),
+            'created_at'=>$_SERVER['REQUEST_TIME']
+        ]);
     }
 
 }

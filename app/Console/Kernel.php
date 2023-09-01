@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\ControllerMaker',
         'App\Console\Commands\ModelMaker',
         'App\Console\Commands\MiddlewareMaker',
+        'App\Console\Commands\Test',
     ];
 
     /**

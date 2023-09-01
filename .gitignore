@@ -1,6 +1,7 @@
 /vendor
 /public/dist
 /.idea
+/app/Console/Commands/Test.php
 Homestead.json
 Homestead.yaml
 .env

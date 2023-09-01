@@ -3,14 +3,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\CommonEnums;
 use App\Http\Controllers\Controller;
-use App\Models\MemberLog;
-use App\Models\Permissions;
+use App\Models\{MemberLog,Permissions};
 use Illuminate\Support\Facades\DB;
 
 class Base extends Controller
 {
-    protected $aid = 0;
-    protected $logId = 0;
+    protected $aid = 0; // 成员id
+    protected $logId = 0; // 日志id，用于修改日志内容
 
     public function __construct()
     {
@@ -31,12 +30,13 @@ class Base extends Controller
         $this->checkPermission();
     }
 
+    // 校验接口权限
     protected function checkPermission()
     {
+        // 白名单
         $white = [
-            ''
+            '/a/logout','/a/user_info','/a/change_info','/a/user_logs',
         ];
-
         $path = '/'.request()->path();
 
         if(!in_array($path, $white)){ //不在白名单里，查角色关系
@@ -48,35 +48,17 @@ class Base extends Controller
             $pid = explode(',',implode(',',$pid));
             $pid = array_unique($pid);
 
-            $permission = Permissions::whereIn('id',$pid)->where(['url'=>$path,'status'=>0,'deleted'=>CommonEnums::NORMAL])->select(['name','log'])->first();
+            $permission = Permissions::whereIn('id',$pid)->where(['url'=>$path,'status'=>0,'deleted_at'=>CommonEnums::NORMAL])->select(['name','log'])->first();
             if(empty($permission)){
                 $this->exitError('无权限访问：['.$path.']');
             }
             if ($permission->log == 1){
-                $r = request();
-                $h = [];
-                foreach ($r->headers as $k => $v) {
-                    if (!in_array($k,['accept-language','accept','sec-ch-ua-mobile','sec-fetch-site','accept-encoding','referer','sec-fetch-dest'])){
-                        $h[$k] = $v;
-                    }
-                }
-                $this->logId = MemberLog::insertGetId([
-                    'member_id'=>$this->aid,
-                    'title'=> '调用了【'.$permission->name.'】',
-                    'detail'=>'',
-                    'ip'=>request()->ip(),
-                    'request'=>json_encode([
-                        'path'=> $r->getRequestUri(),
-                        'method'=> $r->getMethod(),
-                        'header'=> $h,
-                        'body'=> $r->request
-                    ],256),
-                    'created_at'=>$_SERVER['REQUEST_TIME']
-                ]);
+                $this->logId = $this->writeMemberLog($this->aid,'调用了【'.$permission->name.'】');
             }
         }
     }
 
+    // 更新成员日志内容
     protected function saveLog(string $remark)
     {
         if ($remark){

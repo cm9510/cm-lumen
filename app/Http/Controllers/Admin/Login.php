@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\CommonEnums;
 use App\Http\Controllers\Controller;
-use App\Models\{Members, MemberRoleRelation};
+use App\Models\{MemberLog, Members, MemberRoleRelation};
 
 class Login extends Controller
 {
@@ -28,7 +28,7 @@ class Login extends Controller
         }
         app('redis')->delKey('captcha_admin_'.$code);
 
-        $member = Members::where(['phone'=>$account,'deleted'=>CommonEnums::NORMAL])
+        $member = Members::where(['phone'=>$account,'deleted_at'=>CommonEnums::NORMAL])
             ->select(['id','nickname','password','salt','status','last_login_at'])
             ->first();
         if(empty($member)){
@@ -65,6 +65,8 @@ class Login extends Controller
         app('redis')->setKey('admin_token_'.$member->id, $arr['s'], 259200); // 3天有效期
         $result['token'] = $str;
 
+        // 写日志
+        $this->writeMemberLog($member->id,'登入','登入了后台');
         return $this->successJson($result,'欢迎登入：'.$member->nickname);
     }
 }

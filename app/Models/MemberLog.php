@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MemberLog extends Model
 {
@@ -17,5 +18,10 @@ class MemberLog extends Model
     ];
 
     public $timestamps = false;
+
+    public function member(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\Members','member_id')->select(['id','nickname']);
+    }
 
 }

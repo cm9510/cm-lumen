@@ -7,7 +7,7 @@ class MemberRoleRelation extends Model
 {
     protected $table = 'cm_role_member';
 
-    protected $fillable = ['member_id', 'role_id', 'create_at'];
+    protected $fillable = ['member_id', 'role_id', 'created_at'];
 
     public $timestamps = false;
 
@@ -18,8 +18,8 @@ class MemberRoleRelation extends Model
     public function roles()
     {
         return $this->hasOne('App\Models\Roles','id','member_id')
-            ->where(['status'=>0,'deleted'=>0])
-            ->select(['id','name','key','roles','redirect']);
+            ->where(['status'=>0,'deleted_at'=>0])
+            ->select(['id','name','key','roles']);
     }
 
 }

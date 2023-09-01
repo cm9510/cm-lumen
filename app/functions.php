@@ -16,9 +16,16 @@ if(!function_exists('biz_size')){
     }
 }
 
-if (!function_exists('write_member_log')){
-
-    function write_member_log(int $aid,string $title, string $detail){
-
+if (!function_exists('hide_phone')){
+    /**
+     * 掩盖手机号
+     * @param string $phone
+     * @return string
+     */
+    function hide_phone(string $phone):string{
+        if (strlen($phone) != 11){
+            return $phone;
+        }
+        return substr($phone,0,3).'****'.substr($phone,-4);
     }
 }

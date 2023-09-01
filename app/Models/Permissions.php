@@ -8,13 +8,14 @@ class Permissions extends Model
     protected $table = 'cm_permissions';
 
     protected $fillable = [
+        'group_id',
         'name',
         'url',
         'status',
         'log',
         'creator_id',
         'updator_id',
-        'create_at'
+        'created_at'
     ];
 
     public $timestamps = false;
