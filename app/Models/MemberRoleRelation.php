@@ -19,7 +19,7 @@ class MemberRoleRelation extends Model
     {
         return $this->hasOne('App\Models\Roles','id','member_id')
             ->where(['status'=>0,'deleted_at'=>0])
-            ->select(['id','name','key','roles']);
+            ->select(['id','name','key','routers']);
     }
 
 }

@@ -48,12 +48,12 @@ class Base extends Controller
             $pid = explode(',',implode(',',$pid));
             $pid = array_unique($pid);
 
-            $permission = Permissions::whereIn('id',$pid)->where(['url'=>$path,'status'=>0,'deleted_at'=>CommonEnums::NORMAL])->select(['name','log'])->first();
+            $permission = Permissions::whereIn('id',$pid)->where(['url'=>$path,'deleted_at'=>CommonEnums::NORMAL])->select(['name','log'])->first();
             if(empty($permission)){
                 $this->exitError('无权限访问：['.$path.']');
             }
             if ($permission->log == 1){
-                $this->logId = $this->writeMemberLog($this->aid,'调用了【'.$permission->name.'】');
+                $this->logId = $this->writeMemberLog($this->aid,'操作了【'.$permission->name.'】');
             }
         }
     }

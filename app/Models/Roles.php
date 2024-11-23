@@ -15,7 +15,7 @@ class Roles extends Model
         'roles',
         'status',
         'creator_id',
-        'updator_id',
+        'updater_id',
         'redirect',
         'created_at'
     ];
@@ -35,9 +35,9 @@ class Roles extends Model
      * 关联一个最近修改人
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function updator()
+    public function updater()
     {
-        return $this->hasOne('App\Models\Members','id','updator_id')->select(['id','nickname','phone']);
+        return $this->hasOne('App\Models\Members','id','updater_id')->select(['id','nickname','phone']);
     }
 
 }

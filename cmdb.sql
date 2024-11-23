@@ -74,7 +74,7 @@ CREATE TABLE `cm_permissions` (
   `url` varchar(66) NOT NULL COMMENT 'url',
   `status` tinyint(1) DEFAULT '0' COMMENT '0正常 1停用',
   `creator_id` int(10) NOT NULL COMMENT '创建人id',
-  `updator_id` int(10) DEFAULT '0' COMMENT '最近修改人id',
+  `updater_id` int(10) DEFAULT '0' COMMENT '最近修改人id',
   `log` tinyint(1) DEFAULT '0' COMMENT '是否记录日志 0否 1是',
   `created_at` int(10) NOT NULL COMMENT '创建时间',
   `deleted_at` int(11) DEFAULT '0'
@@ -84,7 +84,7 @@ CREATE TABLE `cm_permissions` (
 -- 转存表中的数据 `cm_permissions`
 --
 
-INSERT INTO `cm_permissions` (`id`, `group_id`, `name`, `url`, `status`, `creator_id`, `updator_id`, `log`, `created_at`, `deleted_at`) VALUES
+INSERT INTO `cm_permissions` (`id`, `group_id`, `name`, `url`, `status`, `creator_id`, `updater_id`, `log`, `created_at`, `deleted_at`) VALUES
 (1, 1, '添加|修改权限', '/a/add_permission', 0, 1, 0, 1, 1654321085, 0),
 (2, 1, '权限列表', '/a/permission_list', 0, 1, 0, 0, 1655357544, 0),
 (3, 0, '删除权限', '/a/del_permission', 0, 1, 0, 0, 1655357558, 1692784683),
@@ -134,10 +134,10 @@ CREATE TABLE `cm_roles` (
   `key` varchar(18) NOT NULL COMMENT '唯一标识',
   `desc` varchar(90) DEFAULT '' COMMENT '描述',
   `permission_id` text COMMENT '权限id',
-  `roles` text COMMENT '前端vue路由name值',
+  `routers` text COMMENT '前端vue路由name值',
   `status` tinyint(1) DEFAULT '0' COMMENT '0正常 1停用',
   `creator_id` int(10) NOT NULL COMMENT '创建人id',
-  `updator_id` int(10) DEFAULT '0' COMMENT '最近修改人id',
+  `updater_id` int(10) DEFAULT '0' COMMENT '最近修改人id',
   `redirect` varchar(18) NOT NULL COMMENT '登入后跳转路由name',
   `created_at` int(10) NOT NULL,
   `deleted_at` int(11) DEFAULT '0'
@@ -147,7 +147,7 @@ CREATE TABLE `cm_roles` (
 -- 转存表中的数据 `cm_roles`
 --
 
-INSERT INTO `cm_roles` (`id`, `name`, `key`, `desc`, `permission_id`, `roles`, `status`, `creator_id`, `updator_id`, `redirect`, `created_at`, `deleted_at`) VALUES
+INSERT INTO `cm_roles` (`id`, `name`, `key`, `desc`, `permission_id`, `routers`, `status`, `creator_id`, `updater_id`, `redirect`, `created_at`, `deleted_at`) VALUES
 (1, '开发员', 'developer', '系统开发人员。', '1,2,4,5,6,7,8,9,10,11,12,13', 'sysLogs,sysMembers,sysPermission,sysRole', 0, 1, 1, 'sysPermission', 1655444498, 0);
 
 -- --------------------------------------------------------
